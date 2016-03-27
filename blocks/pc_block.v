@@ -6,12 +6,12 @@
 module pc_block(
 	//inputs
 	//reset
-   input rst,
-   //clock
-   input clk,
+	input rst,
+	//clock
+	input clk,
 	//update signal
 	input PC_Update,
-   //next address 
+	//next address 
 	input [(`BUS_WIDTH-1):0] next_addr,
 	//current address
 	output reg [(`BUS_WIDTH-1):0] curr_addr 
