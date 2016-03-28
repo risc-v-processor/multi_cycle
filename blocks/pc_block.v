@@ -10,7 +10,7 @@ module pc_block(
 	//clock
 	input clk,
 	//update signal
-	input PC_Update,
+	input pc_update,
 	//next address 
 	input [(`BUS_WIDTH-1):0] next_addr,
 	//current address
@@ -23,7 +23,7 @@ module pc_block(
 			curr_addr <= {`BUS_WIDTH{1'b0}};
 		end
 		
-		else if (PC_Update == 1'b1) begin		
+		else if (pc_update == 1'b1) begin		
 			curr_addr <= next_addr;
 		end
 	end	 

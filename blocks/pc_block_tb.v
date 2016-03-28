@@ -5,7 +5,7 @@ module pc_block_tb;
 	// Inputs
 	reg rst;
 	reg clk;
-	reg PC_Update;
+	reg pc_update;
 	reg [31:0] next_addr;
 
 	// Outputs
@@ -15,17 +15,17 @@ module pc_block_tb;
 	pc_block uut (
 		.rst(rst), 
 		.clk(clk), 
-		.PC_Update(PC_Update),
+		.pc_update(pc_update),
 		.next_addr(next_addr), 
 		.curr_addr(curr_addr)
 	);
 
 	initial begin
-		$monitor($time, " reset = %b, PC_Update = %b, current address = %d, next address = %d", rst, PC_Update, curr_addr, next_addr);
+		$monitor($time, " reset = %b, pc_update = %b, current address = %d, next address = %d", rst, pc_update, curr_addr, next_addr);
 		// Initialize Inputs
 		rst = 0;
 		clk = 0;
-		PC_Update = 0;
+		pc_update = 0;
 		
 		// Wait 100 ns for global reset to finish
 		#100; 
@@ -40,11 +40,11 @@ module pc_block_tb;
 		//set value of next_addr
 		next_addr = 32'h4444;
 		#30;
-		//set PC_Update signal
-		PC_Update = 1'b1;
+		//set pc_update signal
+		pc_update = 1'b1;
 		#100;
-		//reset PC_Update signal
-		PC_Update = 1'b0;
+		//reset pc_update signal
+		pc_update = 1'b0;
 		#50;
 		//change value of next_addr
 		next_addr = 32'h5555;
