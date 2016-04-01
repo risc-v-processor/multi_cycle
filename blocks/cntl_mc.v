@@ -51,7 +51,7 @@
 `define R_TYPE 5'b01100
 
 
-module cntl_mc( input [4:0] opcode,
+module cntl_mc(
 		input [(`INSTRUCTION_WIDTH-1):0] instruction,
 		input bcond,
 		input clk,
@@ -69,10 +69,12 @@ module cntl_mc( input [4:0] opcode,
 		output reg [1:0] op2_sel,
 		output reg [1:0] alu_demux,
 		output reg [(`ALU_CTRL_WIDTH-1):0] alu_ctrl,
-		output reg [1:0] mem_size
+		output reg [1:0] memory_size,
+		output reg [4:0] curr_state
     );
 	 
 	 reg [12:0] micro_inst [0:23];
+	 reg [0:23] cntl_sig;
 	 reg [4:0] state;
 	 reg [4:0] next_state;
 	
@@ -121,6 +123,7 @@ module cntl_mc( input [4:0] opcode,
 				{pc_update,load_ir,load_mdr,mem_sel,mem_wr_en,reg_file_wr_en,wr_reg_mux_sel,op1_sel,op2_sel,
 					alu_demux} <= cntl_sig;
 			end
+			curr_state<=state;
 	end
 
 //Define the state transitions and the ALU and memory control signals for each of the states
@@ -144,10 +147,10 @@ module cntl_mc( input [4:0] opcode,
 						 
 						
 						  immediate[0] = 1'b0;
-						  immediate[12:1] = {inst[7], inst[30:25], inst[11:8]};
+						  immediate[12:1] = {instruction[7], instruction[30:25], instruction[11:8]};
 						  immediate[(`IMM_WIDTH-1):13]=1'bx;
 						  
-						 if(inst[14:13] == 2'b11)
+						 if(instruction[14:13] == 2'b11)
 							sz_ex=0;					
 						  //else perform sign extend
 						 else begin
@@ -158,7 +161,7 @@ module cntl_mc( input [4:0] opcode,
 					//set the alu_ctrl signal to {1'b1, 1'b0, "funct3"}
 					//bit3 = 1'b0, no subtract instructions (I-type)
 					//MSB (bit 4) = 1'b1, branch
-					alu_op = {1'b1, 1'b0, inst[14:12]};					
+					alu_ctrl = {1'b1, 1'b0, instruction[14:12]};					
 					//data memory size
 					//data is not written to data memory
 					memory_size = 2'bxx;	
@@ -166,9 +169,9 @@ module cntl_mc( input [4:0] opcode,
 				
 						`JALR:begin
 							  next_state=`JALR_S;	
-							  immediate[11:0] = inst[31:20];
+							  immediate[11:0] = instruction[31:20];
 							  immediate[(`IMM_WIDTH-1):12]=1'bx;
-							  alu_op = inst[6:2];					
+							  alu_ctrl = instruction[6:2];					
 							  memory_size = 2'bxx;
 							  sz_ex=1;
 						 end
@@ -176,56 +179,56 @@ module cntl_mc( input [4:0] opcode,
 						`JAL:begin
 							next_state=`JAL_S;	
 							immediate[0] = 1'b0;
-							immediate[20:1] = {inst[19:12], inst[20], inst[30:21]};
-							alu_op = {(`ALU_CTRL_WIDTH){1'bx}};					
+							immediate[20:1] = {instruction[19:12], instruction[20], instruction[30:21]};
+							alu_ctrl = {(`ALU_CTRL_WIDTH){1'bx}};					
 							memory_size = 2'bxx;	
 							sz_ex=1;	
 						end
 						
 						`AUIPC:begin
 							next_state=`AUIPC_S;
-							immediate[19:0] = inst[31:12];
+							immediate[19:0] = instruction[31:12];
 						   immediate[(`IMM_WIDTH-1)]=1'bx;
-							alu_op = {(`ALU_CTRL_WIDTH){1'bx}};
+							alu_ctrl = {(`ALU_CTRL_WIDTH){1'bx}};
 							memory_size = 2'bxx;	
 							sz_ex=0;
 						end
 						
 						`LUI:begin
 							next_state=`LUI_S;
-							immediate[19:0] = inst[31:12];
+							immediate[19:0] = instruction[31:12];
 							immediate[(`IMM_WIDTH-1)]=1'bx;
-							alu_op = 5'b11000;
-						   d_memory_size = 2'bxx;	
+							alu_ctrl = 5'b11000;
+						   memory_size = 2'bxx;	
 							sz_ex=1;
 						end
 						
 						`STORE:begin
 						  next_state=`STORE_S;
-						  immediate[11:0] = {inst[31:25],inst[11:7]};
+						  immediate[11:0] = {instruction[31:25],instruction[11:7]};
 						  immediate[(`IMM_WIDTH-1):12]=1'bx;
-						  alu_op = {(`ALU_CTRL_WIDTH){1'b0}};
-						  memory_size = inst[13:12];
+						  alu_ctrl = {(`ALU_CTRL_WIDTH){1'b0}};
+						  memory_size = instruction[13:12];
 						  sz_ex=1;
 						end
 						
 						`LOAD:begin
 						  next_state=`LOAD_S;
-						  immediate = inst[31:20];
-						  alu_op = {(`ALU_CTRL_WIDTH){1'b0}};
+						  immediate = instruction[31:20];
+						  alu_ctrl = {(`ALU_CTRL_WIDTH){1'b0}};
 						  sz_ex=1;
 					
 						//data memory size
 						//size depends on the instruction
-						memory_size = inst[13:12];
+						memory_size = instruction[13:12];
 							end
 												
 					  `I_TYPE:begin
 						  next_state=`I_TYPE_S;						
-					     immediate[0:11] = inst[31:20];
+					     immediate[11:0] = instruction[31:20];
 						  immediate[(`IMM_WIDTH-1):12]=1'bx;
 							//perform zero extension only for SLTIU
-							if(inst[14:12] == 3'b011) begin
+							if(instruction[14:12] == 3'b011) begin
 									sz_ex=0;
 							end								
 								//else perform sign extend
@@ -234,13 +237,13 @@ module cntl_mc( input [4:0] opcode,
 							end
 								
 								
-							if(inst[14:12] == 3'b010 || inst[14:12] == 3'b011) begin
+							if(instruction[14:12] == 3'b010 || instruction[14:12] == 3'b011) begin
 							//Instructions that involve subtract operation (SLTI and SLTIU respectively)
 							//ALU control signal
 							//set LSB 3 bits to the "funct3" field
 							//bit 3 = 1'b1 to indicate stubract operation
 							//bit 4 = 0 (no branching)
-							alu_op = {1'b0, 1'b1, inst[14:12]};
+							alu_ctrl = {1'b0, 1'b1, instruction[14:12]};
 						end
 						
 						else begin
@@ -249,7 +252,7 @@ module cntl_mc( input [4:0] opcode,
 							//set the alu_ctrl signal to {2'b00, "funct3"}
 							//bit3 = 1'b0, no subtract operation
 							//MSB (bit 4) = 1'b0, no branching
-							alu_op = {2'b00, inst[14:12]};
+							alu_ctrl = {2'b00, instruction[14:12]};
 						end		
 						
 						memory_size = 2'bxx;	
@@ -258,7 +261,7 @@ module cntl_mc( input [4:0] opcode,
 						`R_TYPE:begin
 						  next_state=`R_TYPE_S;
 						  immediate={(`OPERAND_WIDTH-1){1'bx}};
-						  alu_op = {1'b0,inst[30], inst[14:12]};
+						  alu_ctrl = {1'b0,instruction[30], instruction[14:12]};
 						  memory_size = 2'bxx;	
 						  sz_ex=1'bx;
 						end	
