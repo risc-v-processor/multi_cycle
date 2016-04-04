@@ -136,10 +136,12 @@ always@(posedge clk)
 			case(state)			
 			`FETCH:begin
 			  next_state=`LOAD_IR;
+			  alu_ctrl=5'bxxxxx;
 			end
 			
 			`LOAD_IR:begin
 			  next_state=`DECODE;
+			  alu_ctrl=5'bxxxxx;
 			end
 			
 			`DECODE:begin
@@ -278,91 +280,115 @@ always@(posedge clk)
 			  if(bcond==0)
 			   next_state=`PC_WR;
 			  else
-			   next_state=`BCOND1;							
+			   next_state=`BCOND1;	
+					
+				alu_ctrl=5'bxxxxx;
 			 end
 			
 			`PC_WR:begin
 				next_state=`FETCH;
+				alu_ctrl=5'b00000;
+				alu_ctrl=5'bxxxxx;
 			end
 			 
 			`BCOND1:begin
 			   next_state=`PC_WR;
+				alu_ctrl=5'bxxxxx;
 			end
 			
 			`JALR_S:begin
 			   next_state=`JALR2;
+				alu_ctrl=5'bxxxxx;
 			end
 			
 			`JALR2:begin
 			  next_state=`JALR_ADD;
+			  alu_ctrl=5'bxxxxx;
 			end
 			
 			`JALR_ADD:begin	
 				next_state=`PC_WR;
+				alu_ctrl=5'b00000;				
 			end
 			
 			`JAL_S:begin
 			  next_state=`JAL2;
+			  alu_ctrl=5'bxxxxx;
 			end
 			
 			`JAL2:begin
 			  next_state=`ALU2PC;	
+			  alu_ctrl=5'bxxxxx;
 			end
 			
 			`ALU2PC:begin
 			   next_state=`PC_WR;
+				alu_ctrl=5'b00000;
 			end
 			
 			`AUIPC_S:begin
 			   next_state=`WRITE_BACK;
+				alu_ctrl=5'bxxxxx;
 			end
 			
 			`WRITE_BACK:begin
 			   next_state=`PC_ADD;
+				alu_ctrl=5'bxxxxx;
 			end
 			
 			`PC_ADD:begin
 				next_state=`PC_WR;
+				alu_ctrl=5'b00000;
 			end
 			
 			`LUI_S:begin
 			   next_state=`WRITE_BACK;
+				alu_ctrl=5'bxxxxx;
 			end
 			
 			`STORE_S:begin
 			  next_state=`STORE_MEM;
+			  alu_ctrl=5'bxxxxx;
 			end
 			
 			`STORE_MEM:begin
 			   next_state=`PC_ADD;
+				alu_ctrl=5'bxxxxx;
 			end
 			
 			`LOAD_S:begin
 			   next_state=`LOAD2;
+				alu_ctrl=5'bxxxxx;
 			end
 			
 			`LOAD2:begin
 			  next_state=`LOAD_MDR;
+			  alu_ctrl=5'bxxxxx;
 			end
 			
 			`LOAD_MDR:begin
 				next_state=`LOAD_WR;
+				alu_ctrl=5'bxxxxx;
 			end
 			
 			`LOAD_WR:begin
 				next_state=`PC_ADD;
+				alu_ctrl=5'bxxxxx;
 			end
     			
     		`I_TYPE_S:begin
 			   next_state=`WRITE_BACK;
+				alu_ctrl=5'bxxxxx;
 			end
 			
 			`R_TYPE_S:begin
 			   next_state=`WRITE_BACK;
+				alu_ctrl=5'bxxxxx;
 			end
 			
 			default:begin
 			  next_state=`FETCH;
+			  alu_ctrl=5'bxxxxx;
 			end
 			endcase
 			
