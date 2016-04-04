@@ -56,7 +56,7 @@ module memory(
 	
 	//sequential logic	
 	//handle reset signal and write to mem_map_io
-	always@(negedge clk) begin
+	always @ (negedge clk) begin
 		//check if reset signal is set
 		if (rst == 1'b1) begin
 			mem_map_io <= 32'b0;
