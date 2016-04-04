@@ -5,8 +5,7 @@
 `define BUS_WIDTH 32
 //Byte addressable memory
 //Memory vector size = Total size/8
-//(1Kb memory)
-`define MEM_VECTOR_SIZE 64
+`define MEM_VECTOR_SIZE 128
 //memory size
 //word (32 bits)
 `define WORD 2'b10
@@ -101,7 +100,7 @@ module mem(
 	
 	//sequential logic
 	//initializing and writing to memory
-	always @ (posedge clk) begin
+	always @ (negedge clk) begin
 		//initialize memory
 		if (rst == 1'b1) begin
 		
