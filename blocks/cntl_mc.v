@@ -56,6 +56,7 @@ module cntl_mc(
 		input bcond,
 		input clk,
 		input rst,
+		output reg [11:0] micro,
 		output reg sz_ex,
 		output reg [(`OPERAND_WIDTH-1):0] immediate,
 		output reg mem_sel,
@@ -73,8 +74,8 @@ module cntl_mc(
 		output reg [4:0] curr_state
     );
 	 
-	 reg [12:0] micro_inst [0:23];
-	 reg [0:23] cntl_sig;
+	 reg [11:0] micro_inst [0:23];
+	 reg [11:0] cntl_sig;
 	 reg [4:0] state;
 	 reg [4:0] next_state;
 	
@@ -107,25 +108,28 @@ module cntl_mc(
 			micro_inst[`PC_WR]=12'b100x00xxxxxx;			
 		end
 	
-//Assign the states and load the microsinstructions for the state	
-	always@(posedge clk)
+//Assign the states and load the microinstructions for the state	
+always@(posedge clk)
 	begin
-		if(rst==1)
+		if(rst)
 			begin
-				state<=`FETCH;
+				state=`FETCH;
 				{pc_update,load_ir,load_mdr,mem_sel,mem_wr_en,reg_file_wr_en,wr_reg_mux_sel,op1_sel,op2_sel,
 					alu_demux} <= micro_inst[`FETCH];
+					micro<=micro_inst[`FETCH];
 			end
 		
 		else
 			begin
-				state<=next_state;
+				state=next_state;
 				{pc_update,load_ir,load_mdr,mem_sel,mem_wr_en,reg_file_wr_en,wr_reg_mux_sel,op1_sel,op2_sel,
 					alu_demux} <= cntl_sig;
+					micro<=cntl_sig;
 			end
-			curr_state<=state;
+			curr_state=state;
 	end
-
+	
+	
 //Define the state transitions and the ALU and memory control signals for each of the states
 	always @(state or bcond)		
 		begin
@@ -365,4 +369,5 @@ module cntl_mc(
 		  cntl_sig=micro_inst[next_state];
 			
 		end
+	
 endmodule		
