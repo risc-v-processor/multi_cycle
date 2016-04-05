@@ -10,6 +10,8 @@
 `define SIGN_EXTEND 1'b1
 `define ZERO_EXTEND 1'b0
 
+`define U_TYPE_EX 1'b1
+`define STANDARD_EX 1'b0
 
 //Define the states
 //s0 through s23
@@ -57,8 +59,10 @@ module cntl_mc(
 		input clk,
 		input rst,
 		output reg [11:0] micro,
-		output reg sz_ex,
-		output reg [(`OPERAND_WIDTH-1):0] immediate,
+		output reg sz_ex_sel,
+		output reg sz_ex_mode,
+		output reg mem_sz_ex_sel,
+		output reg [(`IMM_WIDTH-1):0] immediate,
 		output reg mem_sel,
 		output reg pc_update,
 		output reg load_ir,
@@ -150,17 +154,17 @@ always@(posedge clk)
 			     case(instruction[6:2])
 			       `BRANCH:begin
 			          next_state=`BRANCH_S;
-						 
-						
+						 mem_sz_ex_sel=1'bx;
+						 sz_ex_mode=`STANDARD_EX;
 						  immediate[0] = 1'b0;
 						  immediate[12:1] = {instruction[7], instruction[30:25], instruction[11:8]};
 						  immediate[(`IMM_WIDTH-1):13]=1'bx;
 						  
 						 if(instruction[14:13] == 2'b11)
-							sz_ex=0;					
+							sz_ex_sel=0;					
 						  //else perform sign extend
 						 else begin
-							sz_ex=1;						  
+							sz_ex_sel=1;						  
 					  end
 						
 						//ALU control signal
@@ -175,71 +179,87 @@ always@(posedge clk)
 				
 						`JALR:begin
 							  next_state=`JALR_S;	
+							  mem_sz_ex_sel=1'bx;
+							  sz_ex_mode=`STANDARD_EX;
 							  immediate[11:0] = instruction[31:20];
 							  immediate[(`IMM_WIDTH-1):12]=1'bx;
 							  alu_ctrl = instruction[6:2];					
 							  memory_size = 2'bxx;
-							  sz_ex=1;
+							  sz_ex_sel=1;
 						 end
 						
 						`JAL:begin
-							next_state=`JAL_S;	
+							next_state=`JAL_S;
+							mem_sz_ex_sel=1'bx;
+						   sz_ex_mode=`STANDARD_EX;
 							immediate[0] = 1'b0;
 							immediate[20:1] = {instruction[19:12], instruction[20], instruction[30:21]};
 							alu_ctrl = {(`ALU_CTRL_WIDTH){1'bx}};					
 							memory_size = 2'bxx;	
-							sz_ex=1;	
+							sz_ex_sel=1;	
 						end
 						
 						`AUIPC:begin
 							next_state=`AUIPC_S;
+							mem_sz_ex_sel=1'bx;
+							sz_ex_mode=`U_TYPE_EX;
 							immediate[19:0] = instruction[31:12];
 						   immediate[(`IMM_WIDTH-1)]=1'bx;
 							alu_ctrl = {(`ALU_CTRL_WIDTH){1'bx}};
 							memory_size = 2'bxx;	
-							sz_ex=0;
+							sz_ex_sel=0;
 						end
 						
 						`LUI:begin
 							next_state=`LUI_S;
+							mem_sz_ex_sel=1'bx;
+							sz_ex_mode=`U_TYPE_EX;
 							immediate[19:0] = instruction[31:12];
 							immediate[(`IMM_WIDTH-1)]=1'bx;
 							alu_ctrl = 5'b11000;
 						   memory_size = 2'bxx;	
-							sz_ex=1;
+							sz_ex_sel=1;
 						end
 						
 						`STORE:begin
 						  next_state=`STORE_S;
+						  mem_sz_ex_sel=1'bx;
+						  sz_ex_mode=`STANDARD_EX;
 						  immediate[11:0] = {instruction[31:25],instruction[11:7]};
 						  immediate[(`IMM_WIDTH-1):12]=1'bx;
 						  alu_ctrl = {(`ALU_CTRL_WIDTH){1'b0}};
 						  memory_size = instruction[13:12];
-						  sz_ex=1;
+						  sz_ex_sel=1;
 						end
 						
 						`LOAD:begin
 						  next_state=`LOAD_S;
 						  immediate = instruction[31:20];
+						  sz_ex_mode=`STANDARD_EX;
 						  alu_ctrl = {(`ALU_CTRL_WIDTH){1'b0}};
-						  sz_ex=1;
-					
-						//data memory size
-						//size depends on the instruction
-						memory_size = instruction[13:12];
+						  sz_ex_sel=1;
+						  if(instruction[14])
+							mem_sz_ex_sel=`ZERO_EXTEND;
+						  else
+							mem_sz_ex_sel=`SIGN_EXTEND;
+							//data memory size
+							//size depends on the instruction
+							memory_size = instruction[13:12];
 							end
 												
 					  `I_TYPE:begin
-						  next_state=`I_TYPE_S;						
+						  next_state=`I_TYPE_S;
+						  mem_sz_ex_sel=1'bx;
+						  sz_ex_mode=`STANDARD_EX;						  
 					     immediate[11:0] = instruction[31:20];
 						  immediate[(`IMM_WIDTH-1):12]=1'bx;
 							//perform zero extension only for SLTIU
 							if(instruction[14:12] == 3'b011) begin
-									sz_ex=0;
+									sz_ex_sel=0;
 							end								
 								//else perform sign extend
 							else begin
-									sz_ex=1;
+									sz_ex_sel=1;
 							end
 								
 								
@@ -266,10 +286,12 @@ always@(posedge clk)
 						
 						`R_TYPE:begin
 						  next_state=`R_TYPE_S;
+						  mem_sz_ex_sel=1'bx;
+						  sz_ex_mode=1'bx;
 						  immediate={(`OPERAND_WIDTH-1){1'bx}};
 						  alu_ctrl = {1'b0,instruction[30], instruction[14:12]};
 						  memory_size = 2'bxx;	
-						  sz_ex=1'bx;
+						  sz_ex_sel=1'bx;
 						end	
 					endcase					
 			 end
