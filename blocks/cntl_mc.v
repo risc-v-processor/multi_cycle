@@ -86,7 +86,6 @@ module cntl_mc(
 	input clk,
 	input rst,
 	//outputs
-	output reg [11:0] micro,
 	output reg sz_ex_sel,
 	output reg [1:0] sz_ex_mode,
 	output reg mem_sz_ex_sel,
@@ -102,9 +101,7 @@ module cntl_mc(
 	output reg op1_sel,
 	output reg [1:0] op2_sel,
 	output reg [1:0] alu_demux,
-	output reg [(`ALU_CTRL_WIDTH-1):0] alu_ctrl,
-	output reg [1:0] mem_size,
-	output reg [4:0] curr_state
+	output reg [(`ALU_CTRL_WIDTH-1):0] alu_ctrl
 );
 	 
 	reg [11:0] micro_inst [0:23];
@@ -112,7 +109,7 @@ module cntl_mc(
 	reg [4:0] state;
 	reg [4:0] next_state;
 	
-	//Assign the states and load the microinstructions for the state
+	//Assign the states and load the micro-instructions for the state
 	//sequential logic	
 	always@(posedge clk) begin
 		//check reset signal
@@ -121,7 +118,7 @@ module cntl_mc(
 			//control store specifies the value of each of those control signals 
 			//that are set based on the state of the FSM
 			micro_inst[`FETCH] <= 12'b000000xxxxxx;
-			micro_inst[`LOAD_IR]<=12'b010x00xxxxxx;
+			micro_inst[`LOAD_IR]<= 12'b010x00xxxxxx;
 			micro_inst[`DECODE] <= 12'b000x00xxxxxx;
 			micro_inst[`BRANCH_S] <= 12'b000x00x101xx;
 			micro_inst[`BCOND1] <= 12'b000x00x010xx;
@@ -148,8 +145,7 @@ module cntl_mc(
 			//initial state
 			state <= `FETCH;
 			{pc_update,load_ir,load_mdr,mem_sel,mem_wr_en,reg_file_wr_en,wr_reg_mux_sel,op1_sel,op2_sel,
-				alu_demux} <= 12'b000000xxxxxx; //FETCH
-			micro <= 12'b000000xxxxxx;
+				alu_demux} <= 12'b000000xxxxxx; //micro-instruction for FETCH
 		end
 		
 		//transition to next state and update the control signals from control store	
@@ -157,10 +153,8 @@ module cntl_mc(
 			state <= next_state;
 			{pc_update,load_ir,load_mdr,mem_sel,mem_wr_en,reg_file_wr_en,wr_reg_mux_sel,op1_sel,op2_sel,
 				alu_demux} <= cntl_sig;
-			micro<=cntl_sig;
 		end
-			
-		curr_state=state;
+
 	end
 	
 	
@@ -398,7 +392,7 @@ module cntl_mc(
 				next_state = `PC_ADD;
 			end
     			
-    		`I_TYPE_S:begin
+			`I_TYPE_S:begin
 				next_state = `WRITE_BACK;
 			end
 			
@@ -412,7 +406,7 @@ module cntl_mc(
 		
 		endcase
 			
-		cntl_sig=micro_inst[next_state];
+		cntl_sig = micro_inst[next_state];
 			
 	end
 	
