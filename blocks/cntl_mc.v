@@ -111,7 +111,7 @@ module cntl_mc(
 	
 	//Assign the states and load the micro-instructions for the state
 	//sequential logic	
-	always@(posedge clk) begin
+	always @ (posedge clk) begin
 		//check reset signal
 		if(rst == 1'b1) begin
 			//Initialize the control store
@@ -172,7 +172,7 @@ module cntl_mc(
 	always @ (*) begin
 		case(state)			
 			`FETCH:begin
-				next_state=`LOAD_IR;
+				next_state = `LOAD_IR;
 				mem_size = `WORD;
 				mem_sz_ex_sel = `ZERO_EXTEND;
 			end
@@ -297,7 +297,7 @@ module cntl_mc(
 					end
 						
 					`R_TYPE:begin
-						next_state=`R_TYPE_S;
+						next_state = `R_TYPE_S;
 						alu_ctrl = {1'b0,inst[30], inst[14:12]};
 					end	
 					

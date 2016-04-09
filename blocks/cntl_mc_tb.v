@@ -61,8 +61,25 @@ module cntl_mc_tb;
 		#100;
         
 		// Add stimulus here
+		#5;
+		//reset the design
+		rst = 1'b1;
+		#20;
+		rst = 1'b0;
+		
+		//provide an instruction input
+		inst = 32'b00000000000000000000000000110100;
+		
+		//terminate simulation
+		#30;
+		$finish;
 
 	end
-      
+	
+	always begin
+		//generate clock signal
+		#10 clk = ~clk;
+	end   
+ 
 endmodule
 

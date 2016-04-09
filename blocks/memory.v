@@ -2,8 +2,8 @@
 
 //macros
 `define BUS_WIDTH 32
-`define I_MEM_SIZE 64
-`define MEM_MAP_IO_ADDRESS 128
+`define I_MEM_SIZE 32
+`define MEM_MAP_IO_ADDRESS 64
 
 module memory(
 	//Outputs

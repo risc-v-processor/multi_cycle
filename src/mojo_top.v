@@ -39,15 +39,17 @@ module mojo_top(
 	
 	wire clk_d;
 	//instance of clock generation unit
-	clock_gen clk_gen_inst ( .clk_d(clk_d),
-							 .rst(rst),
-							 .clk(clk) );
+	clock_gen clk_gen_inst( 
+		.clk_d(clk_d),
+		.rst(rst),
+		.clk(clk) 
+	);
 												
 	//instance of multi cycle processor
 	multi_cycle_processor proc(
 		.mem_map_io(mem_map_io),
 		.rst(rst),
-		.clk(clk)
+		.clk(clk_d)
 	);
 		
 endmodule

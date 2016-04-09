@@ -55,10 +55,11 @@ module multi_cycle_processor(
 	wire [(`BUS_WIDTH-1):0] out_val;
 	
 	memory memory_inst(
+		.mem_map_io(mem_map_io),
 		.out_val(out_val),
 		.wr_en(mem_wr_en),
 		.mem_sz_ex_sel(mem_sz_ex_sel),
-		.address(curr_addr),
+		.address(address),
 		.in_val(reg_data_2),
 		.mem_size(mem_size),
 		.rst(rst),
@@ -239,7 +240,16 @@ module multi_cycle_processor(
 		.alu_ctrl(alu_ctrl),
 		.bcond(bcond),
 		.op1_sel(op1_sel),
-		.op2_sel(op2_sel)
+		.op2_sel(op2_sel),
+		.rst(rst),
+		.clk(clk)
 	);
+	
+	//sequential logic
+	always @ (posedge clk) begin
+		if (rst == 1'b1) begin
+			pc_increment_val <= 32'd4;
+		end
+	end
 	
 endmodule
