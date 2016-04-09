@@ -18,7 +18,7 @@ module pc_block(
 );
 
 	//sequential logic
-	always @(posedge clk) begin
+	always @(negedge clk) begin
 		if (rst == 1'b1) begin
 			curr_addr <= {`BUS_WIDTH{1'b0}};
 		end

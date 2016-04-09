@@ -38,7 +38,7 @@ module ir(
 	always @ (negedge clk) begin
 		//check if reset is asserted and reset design
 		if (rst == 1'b1) begin
-			inst = 32'b0;
+			inst <= 32'b0;
 		end
 		
 		else begin

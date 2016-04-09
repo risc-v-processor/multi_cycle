@@ -95,7 +95,13 @@ module memory_tb;
 		wr_en = 1'b1;
 		address = 128;
 		mem_size = `BYTE;
-		in_val = 32'h0000FFFF;	
+		in_val = 32'h0000FFFF;
+		
+		//read another location in memory
+		#20;
+		wr_en = 1'b0;
+		address = 8;
+		mem_size = `WORD;			
 		
 		//terminate simulation
 		#30;

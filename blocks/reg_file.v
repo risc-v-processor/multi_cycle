@@ -42,7 +42,7 @@ module reg_file(
 	assign reg_data_2 = reg_array[rd_reg_index_2];
 	
 	//synchronize reset, read and write operations with clock
-	always @ (posedge clk) begin
+	always @ (negedge clk) begin
 		if (rst) begin
 			//setup defaults
 			//set all the register values to zero

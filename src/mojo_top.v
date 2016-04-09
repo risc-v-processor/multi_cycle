@@ -26,23 +26,28 @@ module mojo_top(
     input avr_rx_busy // AVR Rx buffer full
     );
 
-wire rst = ~rst_n; // make reset active high
-
-// these signals should be high-z when not used
-assign spi_miso = 1'bz;
-assign avr_rx = 1'bz;
-assign spi_channel = 4'bzzzz;
-
-wire [(`BUS_WIDTH-1):0] mem_map_io;
-
-assign led = mem_map_io[7:0];
-
-wire clk_d;
-//instance of clock generation unit
-clock_gen clk_gen_inst ( .clk_d(clk_d),
-						 .rst(rst),
-						 .clk(clk) );
-											
-//instance of multi cycle processor
+	wire rst = ~rst_n; // make reset active high
+	
+	// these signals should be high-z when not used
+	assign spi_miso = 1'bz;
+	assign avr_rx = 1'bz;
+	assign spi_channel = 4'bzzzz;
+	
+	wire [(`BUS_WIDTH-1):0] mem_map_io;
+	
+	assign led = mem_map_io[7:0];
+	
+	wire clk_d;
+	//instance of clock generation unit
+	clock_gen clk_gen_inst ( .clk_d(clk_d),
+							 .rst(rst),
+							 .clk(clk) );
+												
+	//instance of multi cycle processor
+	multi_cycle_processor proc(
+		.mem_map_io(mem_map_io),
+		.rst(rst),
+		.clk(clk)
+	);
 		
 endmodule

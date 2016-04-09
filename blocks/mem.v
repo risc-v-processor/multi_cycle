@@ -90,8 +90,9 @@ module mem(
 		end
 		
 		else begin
-			data_out = {(`BUS_WIDTH-1){1'bx}};
-		end
+			//input address is invalid => Output value is don't care
+			data_out = {(`BUS_WIDTH){1'bx}};
+		end 
 		
 	end
 	
