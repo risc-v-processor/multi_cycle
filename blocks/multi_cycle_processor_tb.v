@@ -24,12 +24,20 @@ module mutli_cycle_processor_tb;
 		// Wait 100 ns for global reset to finish
 		#100;
         
+        //monitor signals
+        $monitor ($time, " :  state = %d, curr_addr = %x, next_addr = %x, sz_ex_out = %x, alu_ctrl = %b\
+mem_map_io = %d, mem_wr_en = %b, reg_data_2 = %d, reg2 = %d, register2-data = %d", 
+			uut.cntl_mc_inst.state, uut.curr_addr, uut.alu_demux_0, uut.sz_ex_out, uut.alu_ctrl,
+			uut.mem_map_io, uut.mem_wr_en, uut.reg_data_2, uut.reg2, uut.reg_file_inst.reg_array[2]);
+        
 		// Add stimulus here
 		//reset the design
 		#5;
 		rst = 1'b1;
-		#10;
+		#20;
 		rst = 1'b0;
+		
+		//terminate simulation
 		#100;
 		$finish;
 	end

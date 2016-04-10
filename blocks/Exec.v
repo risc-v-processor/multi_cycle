@@ -1,5 +1,5 @@
 //The operations contain 5 bits
-//Branch/LUI/JALR:MSB=1
+//Branch/LUI/JAL/JALR:MSB=1
 //Other ALU instructions:MSB=0
 //MSB is ignored in the macros definition
 
@@ -31,6 +31,7 @@
 `define BGEU 4'b0111
 
 //Jump instruction and load upper immediate
+`define JAL 4'b1011
 `define JALR 4'b1001		
 `define LUI 4'b1000
 
@@ -48,7 +49,7 @@ module Exec(
 	 
 	reg flag;
 	 
-	always@(*)	
+	always @ (*)	
 	begin
 		//Branch instruction if MSB of Operation is set
 		if(Operation[(`ALU_CTRL_WIDTH - 1)]==1)
@@ -104,6 +105,11 @@ module Exec(
 					Out=32'bx;
 				end
 				
+				`JAL: begin
+					Out = (Operand1+Operand2);
+					bcond = 1'b0;
+				end
+					
 				`JALR: begin
 					Out=(Operand1+Operand2);
 					Out[0]=1'b0;
