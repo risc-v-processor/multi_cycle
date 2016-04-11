@@ -54,7 +54,7 @@ module reg_file(
 		else begin
 			//update register file
 			//ensure that "reg_array[0]" is not modified (defaults to 0)
-			if (wr_en && wr_reg_index != {`REGISTER_WIDTH{1'b0}}) begin
+			if (wr_en && (wr_reg_index != {`REGISTER_WIDTH{1'b0}})) begin
 				reg_array[wr_reg_index] <= wr_reg_data;
 			end
 		end

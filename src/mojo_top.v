@@ -1,5 +1,3 @@
-//Register File
-
 //macros
 //Register file properties
 `define BUS_WIDTH 32

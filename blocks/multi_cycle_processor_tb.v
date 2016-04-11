@@ -25,10 +25,10 @@ module mutli_cycle_processor_tb;
 		#100;
         
         //monitor signals
-        $monitor ($time, " :  state = %d, curr_addr = %x, next_addr = %x, sz_ex_out = %x, alu_ctrl = %b\
-mem_map_io = %d, mem_wr_en = %b, reg_data_2 = %d, reg2 = %d, register2-data = %d", 
-			uut.cntl_mc_inst.state, uut.curr_addr, uut.alu_demux_0, uut.sz_ex_out, uut.alu_ctrl,
-			uut.mem_map_io, uut.mem_wr_en, uut.reg_data_2, uut.reg2, uut.reg_file_inst.reg_array[2]);
+        $monitor ($time, " :  state = %d, curr_addr = %x, alu_ctrl = %b, ALU_out = %d, wr_reg_data = %d,\
+reg1 = %d, op1_sel = %b, op2_sel = %b, Operand1 = %d, Operand2 = %d, reg2_data = %d, wr_reg_mux_sel = %b", 
+			uut.cntl_mc_inst.state, uut.curr_addr, uut.alu_ctrl, uut.wr_reg_data, uut.Out, uut.reg1, uut.op1_sel, 
+			uut.op2_sel, uut.Operand1, uut.Operand2, uut.reg_file_inst.reg_array[2], uut.wr_reg_mux_sel);
         
 		// Add stimulus here
 		//reset the design
@@ -48,4 +48,3 @@ mem_map_io = %d, mem_wr_en = %b, reg_data_2 = %d, reg2 = %d, register2-data = %d
 	end
       
 endmodule
-

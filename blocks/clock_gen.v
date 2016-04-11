@@ -9,7 +9,7 @@ module clock_gen (
 	output clk_d,
 	input rst,
 	input clk
-    );
+);
 
 	reg [(`BIT_WIDTH-1) : 0] ctr;
 	assign clk_d = ctr[`BIT_WIDTH-1];
