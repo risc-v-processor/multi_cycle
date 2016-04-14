@@ -79,7 +79,7 @@
 `define R_TYPE 5'b01100
 
 
-module cntl_tst(
+module cntl_mc(
 	//inputs
 	input [(`INSTRUCTION_WIDTH-1):0] inst,
 	input bcond,
@@ -425,7 +425,11 @@ module cntl_tst(
 			
 			else if(state==`JALR_ADD)begin	
 				next_state = `PC_WR;
+<<<<<<< HEAD
 				mem_size = `WORD;
+=======
+				mem_size = 2'bx;
+>>>>>>> aed8e995b37d8ff31c3a497ecb641b5c8ccab1c7
 				mem_sz_ex_sel = 1'bx;
 				
 				//ALU control signal for JALR (target address computation)
@@ -464,7 +468,11 @@ module cntl_tst(
 			
 			else if(state==`WRITE_BACK)begin
 				next_state = `PC_ADD;
+<<<<<<< HEAD
 				mem_size = `WORD;
+=======
+				mem_size = 2'bx;
+>>>>>>> aed8e995b37d8ff31c3a497ecb641b5c8ccab1c7
 				mem_sz_ex_sel = 1'bx;
 				alu_ctrl=5'bxxxxx;
 			end
