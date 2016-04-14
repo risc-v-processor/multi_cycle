@@ -38,7 +38,7 @@ reg1 = %d, op1_sel = %b, op2_sel = %b, Operand1 = %d, Operand2 = %d, reg2_data =
 		rst = 1'b0;
 		
 		//terminate simulation
-		#100;
+		#300;
 		$finish;
 	end
 	

@@ -173,6 +173,16 @@ module multi_cycle_processor(
 				//value got from sign and zero extend unit
 				Operand2 = sz_ex_out;
 			end
+			
+			2'b11: begin
+				//default value
+				Operand2 = 32'b0;
+			end
+			
+			default: begin
+				//default value
+				Operand2 = 32'b0;
+			end
 		endcase
 	end	
 	
@@ -197,17 +207,36 @@ module multi_cycle_processor(
 			2'b00: begin
 				//connect to PC block
 				alu_demux_0 = Out;
+				alu_demux_1 = 32'b0;
+				alu_demux_2 = 32'b0;
 			end
 			
 			2'b01: begin
 				//connect to register file
+				alu_demux_0 = 32'b0;
 				alu_demux_1 = Out;
+				alu_demux_2 = 32'b0;
 			end
 			
 			2'b10: begin
 				//connect to memory
+				alu_demux_0 = 32'b0;
+				alu_demux_1 = 32'b0;
 				alu_demux_2 = Out;
 			end
+			
+			2'b11: begin
+				alu_demux_0 = 32'b0;
+				alu_demux_1 = 32'b0;
+				alu_demux_2 = 32'b0;
+			end
+			
+			default: begin
+				alu_demux_0 = 32'b0;
+				alu_demux_1 = 32'b0;
+				alu_demux_2 = 32'b0;
+			end
+							
 		endcase
 	end		
 	
