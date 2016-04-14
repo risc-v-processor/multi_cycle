@@ -109,7 +109,35 @@ module cntl_tst(
 	reg [4:0] state;
 	reg [4:0] next_state;
 	
-	initial
+	always@(rst)
+	begin
+		micro_inst[`FETCH]=12'b000000xxxxxx;
+			micro_inst[`LOAD_IR]=12'b010x00xxxxxx;
+			micro_inst[`DECODE]=12'b000x00xxxxxx;
+			micro_inst[`BRANCH_S]=12'b000x00x101xx;
+			micro_inst[`BCOND1]=12'b000x00x010xx;
+			micro_inst[`JALR_S]=12'b000x00x000xx;
+			micro_inst[`JALR2]=12'b000x01xxxx01;
+			micro_inst[`JAL_S]=12'b000x00x000xx;
+			micro_inst[`JAL2]=12'b000x01xxxx01;
+			micro_inst[`ALU2PC]=12'b000x00x010xx;
+			micro_inst[`AUIPC]=12'b000x00x010xx;
+			micro_inst[`WRITE_BACK]=12'b000x010xxx01;
+			micro_inst[`LUI_S]=12'b000x00xx10xx;
+			micro_inst[`STORE_S]=12'b000x00x110xx;
+			micro_inst[`STORE_MEM]=12'b000110xxxx10;
+			micro_inst[`LOAD_S]=12'b000x00x110xx;
+			micro_inst[`LOAD2]=12'b000100xxxx01;
+			micro_inst[`I_TYPE_S]=12'b000x00x110xx;
+			micro_inst[`R_TYPE_S]=12'b000x00x101xx;
+			micro_inst[`JALR_ADD]=12'b000x00x110xx;
+			micro_inst[`LOAD_MDR]=12'b001x00xxxxxx;
+			micro_inst[`LOAD_WR]=12'b000x011000xx;
+			micro_inst[`PC_ADD]=12'b000x00xxxx00;
+			micro_inst[`PC_WR]=12'b100x00xxxxxx;
+	end
+	
+/*	initial
 		begin
 			micro_inst[`FETCH]=12'b000000xxxxxx;
 			micro_inst[`LOAD_IR]=12'b010x00xxxxxx;
@@ -135,7 +163,7 @@ module cntl_tst(
 			micro_inst[`LOAD_WR]=12'b000x011000xx;
 			micro_inst[`PC_ADD]=12'b000x00xxxx00;
 			micro_inst[`PC_WR]=12'b100x00xxxxxx;
-	end		
+	end	*/	
 	
 	
 	//Assign the states and load the micro-instructions for the state
@@ -146,7 +174,7 @@ module cntl_tst(
 			//Initialize the control store
 			//control store specifies the value of each of those control signals 
 			//that are set based on the state of the FSM
-				
+			
 			
 			//initial state
 			state <= `FETCH;
@@ -198,8 +226,8 @@ module cntl_tst(
 			
 			else if (state==`LOAD_IR)begin
 				next_state=`DECODE;
-				mem_size = `WORD;
-				mem_sz_ex_sel = `ZERO_EXTEND;
+				mem_size =2'bx;
+				mem_sz_ex_sel =1'bx;
 				alu_ctrl=5'bxxxxx;
 			end
 			
@@ -276,7 +304,8 @@ module cntl_tst(
 						
 					else if(inst[6:2]==`LOAD)begin
 						next_state = `LOAD_S;
-						imm[(`IMM_WIDTH-1) : 0] = inst[31:20];
+						imm[11:0] = inst[31:20];
+						imm[19:12]=8'bx;
 						sz_ex_mode = `SZ_EX_STANDARD;
 						sz_ex_sel = `SIGN_EXTEND;
 						alu_ctrl = {(`ALU_CTRL_WIDTH){1'b0}};		
@@ -293,8 +322,9 @@ module cntl_tst(
 												
 					else if(inst[6:2]==`I_TYPE)begin
 						next_state = `I_TYPE_S;
-						imm[11:0] = inst[31:20];
-						imm[19:12]=8'bx;
+						//imm[11:0] = inst[31:20];
+						imm={8'bx,inst[31:20]};
+						//imm[19:12]=8'bx;
 						sz_ex_mode = `SZ_EX_STANDARD;
 						//perform zero extension only for SLTIU
 						if(inst[14:12] == 3'b011) begin
@@ -352,51 +382,51 @@ module cntl_tst(
 			else if(state==`BRANCH_S)begin
 				if(bcond == 1'b0) begin
 					next_state = `PC_WR;
-					mem_size = `WORD;
-				mem_sz_ex_sel = `ZERO_EXTEND;
+					mem_size = 2'bx;
+				mem_sz_ex_sel = 1'bx;
 				alu_ctrl=5'bxxxxx;
 				end
 				
 				else begin
 					next_state = `BCOND1;	
-					mem_size = `WORD;
-				mem_sz_ex_sel = `ZERO_EXTEND;
+					mem_size = 2'bx;
+				mem_sz_ex_sel = 1'bx;
 				alu_ctrl=5'bxxxxx;
 				end
 			 end
 			
 			else if(state==`PC_WR)begin
 				next_state = `FETCH;
-				mem_size = `WORD;
-				mem_sz_ex_sel = `ZERO_EXTEND;
+				mem_size = 2'bx;
+				mem_sz_ex_sel = 1'bx;
 				alu_ctrl=5'bxxxxx;
 			end
 			 
 			else if(state==`BCOND1)begin
 				next_state = `PC_WR;
-				mem_size = `WORD;
-				mem_sz_ex_sel = `ZERO_EXTEND;
+				mem_size = 2'bx;
+				mem_sz_ex_sel = 1'bx;
 				alu_ctrl=5'bxxxxx;
 			end
 			
 			else if(state==`JALR_S)begin
 				next_state = `JALR2;
-				mem_size = `WORD;
-				mem_sz_ex_sel = `ZERO_EXTEND;
+				mem_size = 2'bx;
+				mem_sz_ex_sel = 1'bx;
 				alu_ctrl=5'bxxxxx;
 			end
 			
 			else if(state==`JALR2)begin
 				next_state = `JALR_ADD;
-				mem_size = `WORD;
-				mem_sz_ex_sel = `ZERO_EXTEND;
+				mem_size = 2'bx;
+				mem_sz_ex_sel = 1'bx;
 				alu_ctrl=5'bxxxxx;
 			end
 			
 			else if(state==`JALR_ADD)begin	
 				next_state = `PC_WR;
-				mem_size = `WORD;
-				mem_sz_ex_sel = `ZERO_EXTEND;
+				mem_size = 2'bx`WORD;
+				mem_sz_ex_sel = 1'bx;
 				
 				//ALU control signal for JALR (target address computation)
 				alu_ctrl = inst[6:2];				
@@ -404,22 +434,22 @@ module cntl_tst(
 			
 			else if(state==`JAL_S)begin
 				next_state = `JAL2;
-				mem_size = `WORD;
-				mem_sz_ex_sel = `ZERO_EXTEND;
+				mem_size = 2'bx;
+				mem_sz_ex_sel = 1'bx;
 				alu_ctrl=5'bxxxxx;
 			end
 			
 			else if(state==`JAL2)begin
 				next_state = `ALU2PC;
-				mem_size = `WORD;
-				mem_sz_ex_sel = `ZERO_EXTEND;
+				mem_size = 2'bx;
+				mem_sz_ex_sel = 1'bx;
 				alu_ctrl=5'bxxxxx;
 			end
 			
 			else if(state==`ALU2PC)begin
 				next_state = `PC_WR;
-				mem_size = `WORD;
-				mem_sz_ex_sel = `ZERO_EXTEND;
+				mem_size = 2'bx;
+				mem_sz_ex_sel = 1'bx;
 				
 				//ALU control signal for JAL (target address computation)
 				alu_ctrl = inst[6:2];
@@ -427,22 +457,22 @@ module cntl_tst(
 			
 			else if(state==`AUIPC_S)begin
 				next_state = `WRITE_BACK;
-				mem_size = `WORD;
-				mem_sz_ex_sel = `ZERO_EXTEND;
+				mem_size = 2'bx;
+				mem_sz_ex_sel =1'bx;
 				alu_ctrl=5'bxxxxx;
 			end
 			
 			else if(state==`WRITE_BACK)begin
 				next_state = `PC_ADD;
-				mem_size = `WORD;
-				mem_sz_ex_sel = `ZERO_EXTEND;
+				mem_size = 2'bx`WORD;
+				mem_sz_ex_sel = 1'bx;
 				alu_ctrl=5'bxxxxx;
 			end
 			
 			else if(state==`PC_ADD)begin
 				next_state = `PC_WR;
-				mem_size = `WORD;
-				mem_sz_ex_sel = `ZERO_EXTEND;
+				mem_size = 2'bx;
+				mem_sz_ex_sel =1'bx;
 				
 				//ALU control signal for ADD
 				alu_ctrl = 5'b00000;
@@ -450,64 +480,64 @@ module cntl_tst(
 			
 			else if(state==`LUI_S)begin
 				next_state = `WRITE_BACK;
-				mem_size = `WORD;
-				mem_sz_ex_sel = `ZERO_EXTEND;
+				mem_size = 2'bx;
+				mem_sz_ex_sel =1'bx;
 				alu_ctrl=5'bxxxxx;
 			end
 			
 			else if(state==`STORE_S)begin
 				next_state = `STORE_MEM;
-				mem_size = `WORD;
-				mem_sz_ex_sel = `ZERO_EXTEND;
+				mem_size = 2'bx;
+				mem_sz_ex_sel =1'bx;
 				alu_ctrl=5'bxxxxx;
 			end
 			
 			else if(state==`STORE_MEM)begin
 				next_state = `PC_ADD;
-				mem_size = `WORD;
-				mem_sz_ex_sel = `ZERO_EXTEND;
+				mem_size = 2'bx;
+				mem_sz_ex_sel =1'bx;
 				alu_ctrl=5'bxxxxx;
 			end
 			
 			else if(state==`LOAD_S)begin
 				next_state = `LOAD2;
-				mem_size = `WORD;
-				mem_sz_ex_sel = `ZERO_EXTEND;
+				mem_size = 2'bx;
+				mem_sz_ex_sel =1'bx;
 				alu_ctrl=5'bxxxxx;
 			end
 			
 			else if(state==`LOAD2)begin
 				next_state = `LOAD_MDR;
-				mem_size = `WORD;
-				mem_sz_ex_sel = `ZERO_EXTEND;
+				mem_size = 2'bx;
+				mem_sz_ex_sel = 1'bx;
 				alu_ctrl=5'bxxxxx;
 			end
 			
 			else if(state==`LOAD_MDR)begin
 				next_state = `LOAD_WR;
-				mem_size = `WORD;
-				mem_sz_ex_sel = `ZERO_EXTEND;
+				mem_size = 2'bx;
+				mem_sz_ex_sel =1'bx;
 				alu_ctrl=5'bxxxxx;
 			end
 			
 			else if(state==`LOAD_WR)begin
 				next_state = `PC_ADD;
-				mem_size = `WORD;
-				mem_sz_ex_sel = `ZERO_EXTEND;
+				mem_size = 2'bx;
+				mem_sz_ex_sel =1'bx;
 				alu_ctrl=5'bxxxxx;
 			end
     			
 			else if(state==`I_TYPE_S)begin
 				next_state = `WRITE_BACK;
-				mem_size = `WORD;
-				mem_sz_ex_sel = `ZERO_EXTEND;
+				mem_size = 2'bx;
+				mem_sz_ex_sel =1'bx;
 				alu_ctrl=5'bxxxxx;
 			end
 			
 			else if(state==`R_TYPE_S)begin
 				next_state = `WRITE_BACK;
-				mem_size = `WORD;
-				mem_sz_ex_sel = `ZERO_EXTEND;
+				mem_size =2'bx;
+				mem_sz_ex_sel =1'bx;
 				alu_ctrl=5'bxxxxx;
 			end
 			
@@ -516,7 +546,7 @@ module cntl_tst(
 				mem_size = 2'bx;
 				mem_sz_ex_sel =1'bx;
 				alu_ctrl=5'bxxxxx;
-			end
+			end			
 		cntl_sig = micro_inst[next_state];
 			
 	end
