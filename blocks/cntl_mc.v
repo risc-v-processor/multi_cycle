@@ -253,7 +253,7 @@ module cntl_mc(
 		case(state)			
 			`FETCH:begin
 				next_state = `LOAD_IR;
-				imm_val = {`OPERAND_WIDTH{1'bx}};
+				imm_val = {`IMM_WIDTH{1'bx}};
 				mem_size_val = `WORD;
 				mem_sz_ex_sel_val = `ZERO_EXTEND;
 				sz_ex_sel_val = 1'bx;
@@ -263,7 +263,7 @@ module cntl_mc(
 			
 			`LOAD_IR:begin
 				next_state=`DECODE;
-				imm_val = {`OPERAND_WIDTH{1'bx}};
+				imm_val = {`IMM_WIDTH{1'bx}};
 				mem_size_val = 2'bxx;
 				mem_sz_ex_sel_val = 1'bx;
 				sz_ex_sel_val = 1'bx;
@@ -277,6 +277,7 @@ module cntl_mc(
 				case(inst[6:2])
 					`BRANCH:begin
 						next_state=`BRANCH_S;
+						imm_val[(`IMM_WIDTH-1):12] = {(`IMM_WIDTH-12){1'bx}};
 						imm_val[11:0] = {inst[31], inst[7], inst[30:25], inst[11:8]};
 						mem_size_val = 2'bxx;
 						mem_sz_ex_sel_val = 1'bx;
@@ -296,7 +297,8 @@ module cntl_mc(
 					end									  
 				
 					`JALR:begin
-						next_state = `JALR_S;	
+						next_state = `JALR_S;
+						imm_val[(`IMM_WIDTH-1):12] = {(`IMM_WIDTH-12){1'bx}};	
 						imm_val[11:0] = inst[31:20];
 						mem_size_val = 2'bxx;
 						mem_sz_ex_sel_val = 1'bx;
@@ -340,6 +342,7 @@ module cntl_mc(
 						
 					`STORE:begin
 						next_state = `STORE_S;
+						imm_val[(`IMM_WIDTH-1):12] = {(`IMM_WIDTH-12){1'bx}};
 						imm_val[11:0] = {inst[31:25],inst[11:7]};
 						mem_size_val = inst[13:12];
 						mem_sz_ex_sel_val = 1'bx;
@@ -351,7 +354,8 @@ module cntl_mc(
 						
 					`LOAD:begin
 						next_state = `LOAD_S;
-						imm_val[(`IMM_WIDTH-1) : 0] = inst[31:20];
+						imm_val[(`IMM_WIDTH-1):12] = {(`IMM_WIDTH-12){1'bx}};
+						imm_val[11:0] = inst[31:20];
 						//data memory size depends on the instruction
 						mem_size_val = inst[13:12];
 						if(inst[14]) begin
@@ -368,6 +372,7 @@ module cntl_mc(
 												
 					`I_TYPE:begin
 						next_state = `I_TYPE_S;
+						imm_val[(`IMM_WIDTH-1):12] = {(`IMM_WIDTH-12){1'bx}};
 						imm_val[11:0] = inst[31:20];
 						mem_size_val = 2'bxx;
 						mem_sz_ex_sel_val = 1'bx;
@@ -403,7 +408,7 @@ module cntl_mc(
 						
 					`R_TYPE:begin
 						next_state = `R_TYPE_S;
-						imm_val = {`OPERAND_WIDTH{1'bx}};
+						imm_val = {`IMM_WIDTH{1'bx}};
 						mem_size_val = 2'bxx;
 						mem_sz_ex_sel_val = 1'bx;
 						sz_ex_sel_val = 1'bx;
@@ -413,7 +418,7 @@ module cntl_mc(
 					
 					default: begin
 						next_state = 5'bxxxxx;
-						imm_val = {`OPERAND_WIDTH{1'bx}};
+						imm_val = {`IMM_WIDTH{1'bx}};
 						mem_size_val = 2'bxx;
 						mem_sz_ex_sel_val = 1'bx;
 						sz_ex_sel_val = 1'bx;
@@ -430,7 +435,7 @@ module cntl_mc(
 			`BRANCH_S:begin
 				if(bcond == 1'b0) begin
 					next_state = `PC_WR;
-					imm_val = {`OPERAND_WIDTH{1'bx}};
+					imm_val = {`IMM_WIDTH{1'bx}};
 					mem_size_val = 2'bxx;
 					mem_sz_ex_sel_val = 1'bx;
 					sz_ex_sel_val = 1'bx;
@@ -440,7 +445,7 @@ module cntl_mc(
 				
 				else begin
 					next_state = `BCOND1;
-					imm_val = {`OPERAND_WIDTH{1'bx}};
+					imm_val = {`IMM_WIDTH{1'bx}};
 					mem_size_val = 2'bxx;
 					mem_sz_ex_sel_val = 1'bx;
 					sz_ex_sel_val = 1'bx;
@@ -451,7 +456,7 @@ module cntl_mc(
 			
 			`PC_WR:begin
 				next_state = `FETCH;
-				imm_val = {`OPERAND_WIDTH{1'bx}};
+				imm_val = {`IMM_WIDTH{1'bx}};
 				mem_size_val = 2'bxx;
 				mem_sz_ex_sel_val = 1'bx;
 				sz_ex_sel_val = 1'bx;
@@ -461,7 +466,7 @@ module cntl_mc(
 			 
 			`BCOND1:begin
 				next_state = `PC_WR;
-				imm_val = {`OPERAND_WIDTH{1'bx}};
+				imm_val = {`IMM_WIDTH{1'bx}};
 				mem_size_val = 2'bxx;
 				mem_sz_ex_sel_val = 1'bx;
 				sz_ex_sel_val = 1'bx;
@@ -471,7 +476,7 @@ module cntl_mc(
 			
 			`JALR_S:begin
 				next_state = `JALR2;
-				imm_val = {`OPERAND_WIDTH{1'bx}};
+				imm_val = {`IMM_WIDTH{1'bx}};
 				mem_size_val = 2'bxx;
 				mem_sz_ex_sel_val = 1'bx;
 				sz_ex_sel_val = 1'bx;
@@ -481,7 +486,7 @@ module cntl_mc(
 			
 			`JALR2:begin
 				next_state = `JALR_ADD;
-				imm_val = {`OPERAND_WIDTH{1'bx}};
+				imm_val = {`IMM_WIDTH{1'bx}};
 				mem_size_val = 2'bxx;
 				mem_sz_ex_sel_val = 1'bx;
 				sz_ex_sel_val = 1'bx;
@@ -491,7 +496,7 @@ module cntl_mc(
 			
 			`JALR_ADD:begin	
 				next_state = `PC_WR;
-				imm_val = {`OPERAND_WIDTH{1'bx}};
+				imm_val = {`IMM_WIDTH{1'bx}};
 				mem_size_val = 2'bxx;
 				mem_sz_ex_sel_val = 1'bx;
 				sz_ex_sel_val = 1'bx;
@@ -502,7 +507,7 @@ module cntl_mc(
 			
 			`JAL_S:begin
 				next_state = `JAL2;
-				imm_val = {`OPERAND_WIDTH{1'bx}};
+				imm_val = {`IMM_WIDTH{1'bx}};
 				mem_size_val = 2'bxx;
 				mem_sz_ex_sel_val = 1'bx;
 				sz_ex_sel_val = 1'bx;
@@ -512,7 +517,7 @@ module cntl_mc(
 			
 			`JAL2:begin
 				next_state = `ALU2PC;
-				imm_val = {`OPERAND_WIDTH{1'bx}};
+				imm_val = {`IMM_WIDTH{1'bx}};
 				mem_size_val = 2'bxx;
 				mem_sz_ex_sel_val = 1'bx;
 				sz_ex_sel_val = 1'bx;
@@ -522,7 +527,7 @@ module cntl_mc(
 			
 			`ALU2PC:begin
 				next_state = `PC_WR;
-				imm_val = {`OPERAND_WIDTH{1'bx}};
+				imm_val = {`IMM_WIDTH{1'bx}};
 				mem_size_val = 2'bxx;
 				mem_sz_ex_sel_val = 1'bx;
 				sz_ex_sel_val = 1'bx;
@@ -533,7 +538,7 @@ module cntl_mc(
 			
 			`AUIPC_S:begin
 				next_state = `WRITE_BACK;
-				imm_val = {`OPERAND_WIDTH{1'bx}};
+				imm_val = {`IMM_WIDTH{1'bx}};
 				mem_size_val = 2'bxx;
 				mem_sz_ex_sel_val = 1'bx;
 				sz_ex_sel_val = 1'bx;
@@ -543,7 +548,7 @@ module cntl_mc(
 			
 			`WRITE_BACK:begin
 				next_state = `PC_ADD;
-				imm_val = {`OPERAND_WIDTH{1'bx}};
+				imm_val = {`IMM_WIDTH{1'bx}};
 				mem_size_val = 2'bxx;
 				mem_sz_ex_sel_val = 1'bx;
 				sz_ex_sel_val = 1'bx;
@@ -553,7 +558,7 @@ module cntl_mc(
 			
 			`PC_ADD:begin
 				next_state = `PC_WR;
-				imm_val = {`OPERAND_WIDTH{1'bx}};
+				imm_val = {`IMM_WIDTH{1'bx}};
 				mem_size_val = 2'bxx;
 				mem_sz_ex_sel_val = 1'bx;
 				sz_ex_sel_val = 1'bx;
@@ -564,7 +569,7 @@ module cntl_mc(
 			
 			`LUI_S:begin
 				next_state = `WRITE_BACK;
-				imm_val = {`OPERAND_WIDTH{1'bx}};
+				imm_val = {`IMM_WIDTH{1'bx}};
 				mem_size_val = 2'bxx;
 				mem_sz_ex_sel_val = 1'bx;
 				sz_ex_sel_val = 1'bx;
@@ -574,7 +579,7 @@ module cntl_mc(
 			
 			`STORE_S:begin
 				next_state = `STORE_MEM;
-				imm_val = {`OPERAND_WIDTH{1'bx}};
+				imm_val = {`IMM_WIDTH{1'bx}};
 				mem_size_val = 2'bxx;
 				mem_sz_ex_sel_val = 1'bx;
 				sz_ex_sel_val = 1'bx;
@@ -584,7 +589,7 @@ module cntl_mc(
 			
 			`STORE_MEM:begin
 				next_state = `PC_ADD;
-				imm_val = {`OPERAND_WIDTH{1'bx}};
+				imm_val = {`IMM_WIDTH{1'bx}};
 				mem_size_val = 2'bxx;
 				mem_sz_ex_sel_val = 1'bx;
 				sz_ex_sel_val = 1'bx;
@@ -594,7 +599,7 @@ module cntl_mc(
 			
 			`LOAD_S:begin
 				next_state = `LOAD2;
-				imm_val = {`OPERAND_WIDTH{1'bx}};
+				imm_val = {`IMM_WIDTH{1'bx}};
 				mem_size_val = 2'bxx;
 				mem_sz_ex_sel_val = 1'bx;
 				sz_ex_sel_val = 1'bx;
@@ -604,7 +609,7 @@ module cntl_mc(
 			
 			`LOAD2:begin
 				next_state = `LOAD_MDR;
-				imm_val = {`OPERAND_WIDTH{1'bx}};
+				imm_val = {`IMM_WIDTH{1'bx}};
 				mem_size_val = 2'bxx;
 				mem_sz_ex_sel_val = 1'bx;
 				sz_ex_sel_val = 1'bx;
@@ -614,7 +619,7 @@ module cntl_mc(
 			
 			`LOAD_MDR:begin
 				next_state = `LOAD_WR;
-				imm_val = {`OPERAND_WIDTH{1'bx}};
+				imm_val = {`IMM_WIDTH{1'bx}};
 				mem_size_val = 2'bxx;
 				mem_sz_ex_sel_val = 1'bx;
 				sz_ex_sel_val = 1'bx;
@@ -624,7 +629,7 @@ module cntl_mc(
 			
 			`LOAD_WR:begin
 				next_state = `PC_ADD;
-				imm_val = {`OPERAND_WIDTH{1'bx}};
+				imm_val = {`IMM_WIDTH{1'bx}};
 				mem_size_val = 2'bxx;
 				mem_sz_ex_sel_val = 1'bx;
 				sz_ex_sel_val = 1'bx;
@@ -634,7 +639,7 @@ module cntl_mc(
     			
 			`I_TYPE_S:begin
 				next_state = `WRITE_BACK;
-				imm_val = {`OPERAND_WIDTH{1'bx}};
+				imm_val = {`IMM_WIDTH{1'bx}};
 				mem_size_val = 2'bxx;
 				mem_sz_ex_sel_val = 1'bx;
 				sz_ex_sel_val = 1'bx;
@@ -644,7 +649,7 @@ module cntl_mc(
 			
 			`R_TYPE_S:begin
 				next_state = `WRITE_BACK;
-				imm_val = {`OPERAND_WIDTH{1'bx}};
+				imm_val = {`IMM_WIDTH{1'bx}};
 				mem_size_val = 2'bxx;
 				mem_sz_ex_sel_val = 1'bx;
 				sz_ex_sel_val = 1'bx;
@@ -654,7 +659,7 @@ module cntl_mc(
 			
 			default:begin
 				next_state = 5'bxxxxx;
-				imm_val = {`OPERAND_WIDTH{1'bx}};
+				imm_val = {`IMM_WIDTH{1'bx}};
 				mem_size_val = 2'bxx;
 				mem_sz_ex_sel_val = 1'bx;
 				sz_ex_sel_val = 1'bx;

@@ -279,7 +279,7 @@ module multi_cycle_processor(
 	//sequential logic
 	always @ (posedge clk) begin
 		if (rst == 1'b1) begin
-			pc_increment_val <= 32'd4;
+			pc_increment_val <= 32'h00000004;
 		end
 	end
 	
